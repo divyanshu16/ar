@@ -1,5 +1,5 @@
 import { useRef, useMemo, useState } from 'react'
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { useFrame, useThree } from '@react-three/fiber'
 import {
   Environment,
   Float,
@@ -9,6 +9,7 @@ import {
   MeshReflectorMaterial
 } from '@react-three/drei'
 import * as THREE from 'three'
+import Canvas3D from './Canvas3D'
 
 // Single Wedding Ring Component with enhanced effects
 function Ring({ position, rotation, scale = 1, delay = 0, color = "#D4AF37" }) {
@@ -424,14 +425,11 @@ function WeddingRingsScene() {
 export default function WeddingRings({ className = '' }) {
   return (
     <div className={`wedding-rings-container ${className}`} style={{ width: '100%', height: '100%' }}>
-      <Canvas
+      <Canvas3D
         camera={{ position: [0, 0, 6], fov: 45 }}
-        dpr={[1, 2]}
-        gl={{ antialias: true, alpha: true }}
-        style={{ background: 'transparent' }}
       >
         <WeddingRingsScene />
-      </Canvas>
+      </Canvas3D>
     </div>
   )
 }

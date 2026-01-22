@@ -1,9 +1,12 @@
-import { useRef } from 'react'
+import { useRef, Suspense } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { Canvas, useFrame } from '@react-three/fiber'
-import { Float, Sparkles } from '@react-three/drei'
+import { useFrame } from '@react-three/fiber'
+import { Float, Sparkles, Stars, Environment } from '@react-three/drei'
 import * as THREE from 'three'
 import { loveStoryMilestones, coupleData } from '../data/weddingData'
+import FloatingElements from '../components/3d/FloatingElements'
+import { Kalash } from '../components/3d/Kalash'
+import Canvas3D from '../components/3d/Canvas3D'
 
 // 3D Heart for timeline
 function Heart3D({ color = '#E8A4B8', scale = 1 }) {
@@ -38,14 +41,42 @@ function Heart3D({ color = '#E8A4B8', scale = 1 }) {
   )
 }
 
-// 3D Scene for timeline header
+// 3D Scene for timeline header with Kalash
 function TimelineScene() {
   return (
     <>
       <ambientLight intensity={0.6} />
       <pointLight position={[5, 5, 5]} intensity={0.8} color="#FFF8DC" />
-      <Heart3D color="#D4AF37" scale={1.5} />
-      <Sparkles count={50} scale={6} size={2} speed={0.3} color="#D4AF37" opacity={0.5} />
+      <pointLight position={[-5, 3, 5]} intensity={0.5} color="#FFD700" />
+      <spotLight
+        position={[0, 10, 5]}
+        angle={0.3}
+        penumbra={1}
+        intensity={0.8}
+        color="#FFF8DC"
+      />
+
+      {/* Heart on the left */}
+      <group position={[-2.5, 0, 0]}>
+        <Heart3D color="#D4AF37" scale={1.2} />
+      </group>
+
+      {/* Kalash in the center - symbol of abundance and good fortune */}
+      <Suspense fallback={null}>
+        <group position={[0, -1.5, 0]}>
+          <Kalash position={[0, 0, 0]} scale={0.8} color="#B87333" />
+        </group>
+      </Suspense>
+
+      {/* Heart on the right */}
+      <group position={[2.5, 0, 0]}>
+        <Heart3D color="#D4AF37" scale={1.2} />
+      </group>
+
+      <Sparkles count={80} scale={8} size={2} speed={0.3} color="#D4AF37" opacity={0.5} />
+      <Sparkles count={40} scale={6} size={1.5} speed={0.4} color="#FFD700" opacity={0.4} />
+
+      <Environment preset="studio" />
     </>
   )
 }
@@ -94,14 +125,11 @@ function OurStory() {
       {/* Hero Section */}
       <section className="story-hero">
         <div className="story-hero-3d">
-          <Canvas
+          <Canvas3D
             camera={{ position: [0, 0, 5], fov: 50 }}
-            dpr={[1, 2]}
-            gl={{ antialias: true, alpha: true }}
-            style={{ background: 'transparent' }}
           >
             <TimelineScene />
-          </Canvas>
+          </Canvas3D>
         </div>
 
         <motion.div
@@ -116,6 +144,9 @@ function OurStory() {
           <p className="story-intro">
             Every love story is beautiful, but ours is our favorite.
             Here's how our journey together began and led us to forever.
+          </p>
+          <p className="kalash-blessing">
+            May the sacred Kalash bless our union with abundance and prosperity
           </p>
         </motion.div>
       </section>
@@ -146,6 +177,10 @@ function OurStory() {
 
       {/* Quote Section */}
       <section className="quote-section">
+        {/* 3D Mandala Background */}
+        <div className="quote-3d-bg">
+          <FloatingElements variant="mandala" />
+        </div>
         <motion.div
           className="container text-center"
           initial={{ opacity: 0, scale: 0.9 }}
@@ -187,8 +222,13 @@ function OurStory() {
           left: 0;
           width: 100%;
           height: 100%;
-          opacity: 0.6;
+          opacity: 0.85;
           pointer-events: none;
+        }
+
+        /* Kalash styling for Indian wedding aesthetic */
+        .story-hero-3d canvas {
+          filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.3));
         }
 
         .story-hero-content {
@@ -210,6 +250,15 @@ function OurStory() {
           color: var(--warm-gray);
           max-width: 500px;
           margin: 0 auto;
+        }
+
+        .kalash-blessing {
+          font-family: var(--font-display);
+          font-size: 0.95rem;
+          color: var(--gold-dark);
+          margin-top: var(--space-md);
+          opacity: 0.85;
+          letter-spacing: 0.5px;
         }
 
         /* Timeline Section */
@@ -349,6 +398,24 @@ function OurStory() {
             var(--gold-light) 50%,
             var(--cream-dark) 100%
           );
+          position: relative;
+          overflow: hidden;
+        }
+
+        .quote-3d-bg {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 0;
+          opacity: 0.5;
+          pointer-events: none;
+        }
+
+        .quote-section .container {
+          position: relative;
+          z-index: 1;
         }
 
         .love-quote {
