@@ -5,7 +5,6 @@ import { Float, Sparkles, Stars, Environment } from '@react-three/drei'
 import * as THREE from 'three'
 import { loveStoryMilestones, coupleData } from '../data/weddingData'
 import FloatingElements from '../components/3d/FloatingElements'
-import { Kalash } from '../components/3d/Kalash'
 import Canvas3D from '../components/3d/Canvas3D'
 
 // 3D Heart for timeline
@@ -41,40 +40,24 @@ function Heart3D({ color = '#E8A4B8', scale = 1 }) {
   )
 }
 
-// 3D Scene for timeline header with Kalash
+// 3D Scene for timeline header
 function TimelineScene() {
   return (
     <>
       <ambientLight intensity={0.6} />
       <pointLight position={[5, 5, 5]} intensity={0.8} color="#FFF8DC" />
       <pointLight position={[-5, 3, 5]} intensity={0.5} color="#FFD700" />
-      <spotLight
-        position={[0, 10, 5]}
-        angle={0.3}
-        penumbra={1}
-        intensity={0.8}
-        color="#FFF8DC"
-      />
 
-      {/* Heart on the left */}
-      <group position={[-2.5, 0, 0]}>
-        <Heart3D color="#D4AF37" scale={1.2} />
+      {/* Hearts on sides - not overlapping text */}
+      <group position={[-3.5, 0, 0]}>
+        <Heart3D color="#D4AF37" scale={1} />
       </group>
 
-      {/* Kalash in the center - symbol of abundance and good fortune */}
-      <Suspense fallback={null}>
-        <group position={[0, -1.5, 0]}>
-          <Kalash position={[0, 0, 0]} scale={0.8} color="#B87333" />
-        </group>
-      </Suspense>
-
-      {/* Heart on the right */}
-      <group position={[2.5, 0, 0]}>
-        <Heart3D color="#D4AF37" scale={1.2} />
+      <group position={[3.5, 0, 0]}>
+        <Heart3D color="#D4AF37" scale={1} />
       </group>
 
-      <Sparkles count={80} scale={8} size={2} speed={0.3} color="#D4AF37" opacity={0.5} />
-      <Sparkles count={40} scale={6} size={1.5} speed={0.4} color="#FFD700" opacity={0.4} />
+      <Sparkles count={50} scale={8} size={2} speed={0.3} color="#D4AF37" opacity={0.4} />
 
       <Environment preset="studio" />
     </>
@@ -145,9 +128,6 @@ function OurStory() {
             Every love story is beautiful, but ours is our favorite.
             Here's how our journey together began and led us to forever.
           </p>
-          <p className="kalash-blessing">
-            May the sacred Kalash bless our union with abundance and prosperity
-          </p>
         </motion.div>
       </section>
 
@@ -188,11 +168,7 @@ function OurStory() {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <blockquote className="love-quote">
-            "I have found the one whom my soul loves."
-          </blockquote>
-          <cite>- Song of Solomon 3:4</cite>
-        </motion.div>
+          </motion.div>
       </section>
 
       <style>{`

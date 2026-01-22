@@ -2,10 +2,10 @@
 // February 7-8, 2026 | Alwar, Rajasthan
 
 export const coupleData = {
-  groomName: 'Akshay',
-  brideName: 'Tripti',
+  groomName: 'Abhimanyu',
+  brideName: 'Rupali',
   weddingDate: new Date('2026-02-08T19:00:00'),
-  hashtag: '#AkshayWedsTripti',
+  hashtag: '#AbhimanyuWedsRupali',
   tagline: 'Two souls, one journey',
   venue: {
     name: 'Alwar Motel and Resorts',
@@ -26,7 +26,7 @@ export const events = [
     dressCode: 'Shades of Green and Olive',
     followedBy: 'Lunch',
     description: 'Join us as intricate henna designs adorn the bride, celebrating the beauty of tradition.',
-    icon: '🌿',
+    icon: '🪷',
     color: '#708238', // olive green
     gradient: 'linear-gradient(135deg, #708238 0%, #9CAF88 100%)'
   },
@@ -40,7 +40,7 @@ export const events = [
     dressCode: 'Disco Affair',
     followedBy: 'Cocktail Dinner',
     description: 'An evening of music, dance, and celebration as families come together in joy.',
-    icon: '🎶',
+    icon: '🪘',
     color: '#9333EA', // purple for disco
     gradient: 'linear-gradient(135deg, #9333EA 0%, #EC4899 100%)'
   },
@@ -69,7 +69,7 @@ export const events = [
     dressCodeNote: 'Please skip red, maroon, and similar shades',
     followedBy: 'Dinner',
     description: 'The sacred ceremony where two hearts unite in eternal love under the stars.',
-    icon: '💍',
+    icon: '🔥',
     color: '#D4AF37', // gold
     gradient: 'linear-gradient(135deg, #D4AF37 0%, #B8860B 100%)'
   }
@@ -116,7 +116,7 @@ export const loveStoryMilestones = [
     title: 'Forever Begins',
     year: '2026',
     description: 'February 8th - The day we say "I do" surrounded by love.',
-    icon: '💒'
+    icon: '🔥'
   }
 ];
 
@@ -192,9 +192,10 @@ export const galleryImages = [
   }
 ];
 
-// Countdown calculation helper
+// Countdown calculation helper (IST - Indian Standard Time UTC+5:30)
 export const getCountdown = () => {
-  const weddingDate = new Date('2026-02-08T19:00:00');
+  // Wedding date in IST (UTC+5:30)
+  const weddingDate = new Date('2026-02-08T19:00:00+05:30');
   const now = new Date();
   const diff = weddingDate - now;
 
