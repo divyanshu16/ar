@@ -1,9 +1,13 @@
 import { useState, useRef, Suspense } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Canvas, useFrame } from '@react-three/fiber'
-import { Float, Sparkles, Image as DreiImage, Environment } from '@react-three/drei'
+import { useFrame } from '@react-three/fiber'
+import { Float, Sparkles, Image as DreiImage, Environment, Stars } from '@react-three/drei'
 import * as THREE from 'three'
 import { coupleData, galleryImages } from '../data/weddingData'
+import FloatingElements from '../components/3d/FloatingElements'
+import { Diya, DiyaArrangement } from '../components/3d/Diya'
+import { Kalash } from '../components/3d/Kalash'
+import Canvas3D from '../components/3d/Canvas3D'
 
 // 3D Photo Frame Component
 function PhotoFrame3D({ position = [0, 0, 0], rotation = [0, 0, 0], scale = 1, onClick, isSelected }) {
@@ -44,7 +48,7 @@ function PhotoFrame3D({ position = [0, 0, 0], rotation = [0, 0, 0], scale = 1, o
   )
 }
 
-// 3D Gallery Scene
+// 3D Gallery Scene with Indian Wedding Elements
 function GalleryScene({ selectedIndex, onSelect }) {
   const frames = [
     { position: [-3, 0, 0], rotation: [0, 0.3, 0] },
@@ -56,9 +60,10 @@ function GalleryScene({ selectedIndex, onSelect }) {
 
   return (
     <>
-      <ambientLight intensity={0.5} />
+      <ambientLight intensity={0.4} />
       <spotLight position={[0, 5, 5]} intensity={1} angle={0.5} penumbra={1} />
       <pointLight position={[-5, 5, 5]} intensity={0.5} color="#D4AF37" />
+      <pointLight position={[5, 3, 3]} intensity={0.3} color="#FF8C00" />
 
       {frames.map((frame, index) => (
         <PhotoFrame3D
@@ -71,7 +76,23 @@ function GalleryScene({ selectedIndex, onSelect }) {
         />
       ))}
 
+      {/* Diyas around the gallery - creating warm festive atmosphere */}
+      <Suspense fallback={null}>
+        <Diya position={[-4.5, -3, 1]} scale={0.8} flameIntensity={1.2} rotationY={0.5} />
+        <Diya position={[4.5, -3, 1]} scale={0.8} flameIntensity={1.2} rotationY={-0.5} />
+        <Diya position={[-3.5, -3, -2]} scale={0.6} flameIntensity={0.9} rotationY={0.3} />
+        <Diya position={[3.5, -3, -2]} scale={0.6} flameIntensity={0.9} rotationY={-0.3} />
+        <Diya position={[0, -3, -3]} scale={0.7} flameIntensity={1} rotationY={0} />
+      </Suspense>
+
+      {/* Decorative Kalash at corners */}
+      <Suspense fallback={null}>
+        <Kalash position={[-5, -1, -2]} scale={0.4} color="#B87333" />
+        <Kalash position={[5, -1, -2]} scale={0.4} color="#D4AF37" />
+      </Suspense>
+
       <Sparkles count={100} scale={15} size={1.5} speed={0.2} color="#D4AF37" opacity={0.3} />
+      <Sparkles count={50} scale={12} size={1} speed={0.3} color="#FF8C00" opacity={0.2} />
       <Environment preset="studio" />
     </>
   )
@@ -167,6 +188,35 @@ function Gallery() {
     >
       {/* Hero Section */}
       <section className="gallery-hero">
+        {/* 3D Background */}
+        <div className="gallery-hero-3d">
+          <FloatingElements variant="mandala" />
+        </div>
+
+        {/* Decorative Diyas on Hero */}
+        <div className="gallery-hero-diyas gallery-hero-diyas-left">
+          <Canvas3D
+            camera={{ position: [0, 1, 3], fov: 50 }}
+          >
+            <ambientLight intensity={0.3} />
+            <pointLight position={[0, 2, 2]} intensity={0.5} color="#FF8C00" />
+            <Float speed={1.5} floatIntensity={0.3}>
+              <Diya position={[0, 0, 0]} scale={1.2} flameIntensity={1.5} />
+            </Float>
+          </Canvas3D>
+        </div>
+        <div className="gallery-hero-diyas gallery-hero-diyas-right">
+          <Canvas3D
+            camera={{ position: [0, 1, 3], fov: 50 }}
+          >
+            <ambientLight intensity={0.3} />
+            <pointLight position={[0, 2, 2]} intensity={0.5} color="#FF8C00" />
+            <Float speed={1.5} floatIntensity={0.3}>
+              <Diya position={[0, 0, 0]} scale={1.2} flameIntensity={1.5} />
+            </Float>
+          </Canvas3D>
+        </div>
+
         <motion.div
           className="gallery-hero-content"
           initial={{ opacity: 0, y: 30 }}
@@ -202,22 +252,32 @@ function Gallery() {
       <section className="gallery-section">
         {viewMode === '3d' ? (
           <div className="gallery-3d-container">
-            <Canvas
+            <Canvas3D
               camera={{ position: [0, 0, 8], fov: 50 }}
-              dpr={[1, 2]}
-              gl={{ antialias: true, alpha: true }}
             >
-              <Suspense fallback={null}>
-                <GalleryScene
-                  selectedIndex={selectedIndex}
-                  onSelect={handleSelect}
-                />
-              </Suspense>
-            </Canvas>
+              <GalleryScene
+                selectedIndex={selectedIndex}
+                onSelect={handleSelect}
+              />
+            </Canvas3D>
             <p className="gallery-3d-hint">Click on frames to view photos</p>
           </div>
         ) : (
           <div className="container">
+            {/* Decorative Diya Row Above Grid */}
+            <div className="diya-decoration-row">
+              <Canvas3D
+                camera={{ position: [0, 2, 5], fov: 45 }}
+              >
+                <ambientLight intensity={0.3} color="#FFA07A" />
+                <pointLight position={[0, 3, 3]} intensity={0.6} color="#FF8C00" />
+                <pointLight position={[-3, 2, 2]} intensity={0.3} color="#FFD700" />
+                <pointLight position={[3, 2, 2]} intensity={0.3} color="#FFD700" />
+                <DiyaArrangement count={5} radius={3} pattern="line" scale={0.8} centerDiya={false} />
+                <Sparkles count={40} scale={8} size={1.5} speed={0.3} color="#FFD700" opacity={0.4} />
+              </Canvas3D>
+            </div>
+
             <div className="photo-grid">
               {galleryImages.map((image, index) => (
                 <PhotoCard
@@ -227,6 +287,18 @@ function Gallery() {
                   onClick={handleSelect}
                 />
               ))}
+            </div>
+
+            {/* Decorative Diya Row Below Grid */}
+            <div className="diya-decoration-row diya-decoration-bottom">
+              <Canvas3D
+                camera={{ position: [0, 2, 5], fov: 45 }}
+              >
+                <ambientLight intensity={0.3} color="#FFA07A" />
+                <pointLight position={[0, 3, 3]} intensity={0.6} color="#FF8C00" />
+                <DiyaArrangement count={7} radius={4} pattern="arc" scale={0.7} centerDiya={false} />
+                <Sparkles count={30} scale={6} size={1.2} speed={0.2} color="#FF8C00" opacity={0.3} />
+              </Canvas3D>
             </div>
           </div>
         )}
@@ -280,10 +352,46 @@ function Gallery() {
             var(--cream-dark) 100%
           );
           text-align: center;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .gallery-hero-3d {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 0;
+          opacity: 0.6;
+          pointer-events: none;
+        }
+
+        /* Decorative Diyas on Hero */
+        .gallery-hero-diyas {
+          position: absolute;
+          width: 150px;
+          height: 200px;
+          z-index: 1;
+          pointer-events: none;
+        }
+
+        .gallery-hero-diyas-left {
+          left: 5%;
+          top: 50%;
+          transform: translateY(-50%);
+        }
+
+        .gallery-hero-diyas-right {
+          right: 5%;
+          top: 50%;
+          transform: translateY(-50%);
         }
 
         .gallery-hero-content {
           max-width: 700px;
+          position: relative;
+          z-index: 1;
         }
 
         .gallery-hero-content h1 {
@@ -350,11 +458,26 @@ function Gallery() {
           border-radius: var(--radius-full);
         }
 
+        /* Diya Decoration Rows */
+        .diya-decoration-row {
+          height: 150px;
+          margin-bottom: var(--space-lg);
+          position: relative;
+          border-radius: var(--radius-lg);
+          overflow: hidden;
+        }
+
+        .diya-decoration-bottom {
+          margin-top: var(--space-xl);
+          margin-bottom: 0;
+        }
+
         /* Photo Grid */
         .photo-grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
           gap: var(--space-lg);
+          position: relative;
         }
 
         .photo-card {
@@ -543,6 +666,27 @@ function Gallery() {
 
           .gallery-3d-container {
             height: 50vh;
+          }
+
+          /* Hide hero diyas on smaller screens */
+          .gallery-hero-diyas {
+            display: none;
+          }
+
+          /* Smaller diya decoration rows on mobile */
+          .diya-decoration-row {
+            height: 100px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .diya-decoration-row {
+            height: 80px;
+            margin-bottom: var(--space-md);
+          }
+
+          .diya-decoration-bottom {
+            margin-top: var(--space-lg);
           }
         }
       `}</style>

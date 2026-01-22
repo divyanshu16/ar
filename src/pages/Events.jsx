@@ -1,9 +1,12 @@
 import { motion } from 'framer-motion'
-import { Canvas, useFrame } from '@react-three/fiber'
-import { Float, Sparkles } from '@react-three/drei'
-import { useRef } from 'react'
+import { useFrame } from '@react-three/fiber'
+import { Float, Sparkles, Stars } from '@react-three/drei'
+import { useRef, useMemo, Suspense } from 'react'
 import * as THREE from 'three'
 import { events, coupleData } from '../data/weddingData'
+import FloatingElements from '../components/3d/FloatingElements'
+import { Diya, DiyaArrangement } from '../components/3d/Diya'
+import Canvas3D from '../components/3d/Canvas3D'
 
 // 3D Marigold for Events page
 function Marigold3D({ position = [0, 0, 0], scale = 1 }) {
@@ -50,17 +53,35 @@ function Marigold3D({ position = [0, 0, 0], scale = 1 }) {
   )
 }
 
-// 3D Scene for Events
+// 3D Scene for Events with Diyas in Rangoli Pattern
 function EventsScene() {
   return (
     <>
-      <ambientLight intensity={0.7} />
+      <ambientLight intensity={0.5} />
       <pointLight position={[5, 5, 5]} intensity={0.6} color="#FFF8DC" />
       <pointLight position={[-5, -5, 5]} intensity={0.4} color="#FF9933" />
-      <Marigold3D position={[-2, 0, 0]} scale={1.2} />
-      <Marigold3D position={[2, 0.5, -1]} scale={0.9} />
-      <Marigold3D position={[0, -1, 1]} scale={0.7} />
-      <Sparkles count={80} scale={8} size={2} speed={0.3} color="#FF9933" opacity={0.4} />
+      <pointLight position={[0, 3, 2]} intensity={0.5} color="#FF8C00" />
+
+      {/* Marigolds for color variety */}
+      <Marigold3D position={[-3, 1.5, -1]} scale={0.8} />
+      <Marigold3D position={[3, 1.2, -0.5]} scale={0.7} />
+
+      {/* Diya Arrangement in Rangoli Pattern - symbolizes light and prosperity */}
+      <Suspense fallback={null}>
+        <group position={[0, -0.5, 0]} scale={0.6}>
+          <DiyaArrangement
+            count={8}
+            radius={2.5}
+            pattern="rangoli"
+            centerDiya={true}
+            scale={1}
+          />
+        </group>
+      </Suspense>
+
+      {/* Golden sparkles */}
+      <Sparkles count={100} scale={10} size={2} speed={0.3} color="#FFD700" opacity={0.5} />
+      <Sparkles count={60} scale={8} size={1.5} speed={0.2} color="#FF9933" opacity={0.4} />
     </>
   )
 }
@@ -130,14 +151,12 @@ function Events() {
       {/* Hero Section */}
       <section className="events-hero">
         <div className="events-hero-3d">
-          <Canvas
-            camera={{ position: [0, 0, 5], fov: 50 }}
-            dpr={[1, 2]}
-            gl={{ antialias: true, alpha: true }}
-            style={{ background: 'transparent' }}
+          <Canvas3D
+            camera={{ position: [0, 2, 6], fov: 50 }}
+            shadows
           >
             <EventsScene />
-          </Canvas>
+          </Canvas3D>
         </div>
 
         <motion.div
@@ -200,6 +219,10 @@ function Events() {
 
       {/* Venue Section */}
       <section className="venue-section">
+        {/* 3D Hearts Background */}
+        <div className="venue-3d-bg">
+          <FloatingElements variant="hearts" />
+        </div>
         <div className="container">
           <motion.div
             className="section-header"
@@ -241,7 +264,7 @@ function Events() {
 
         /* Events Hero */
         .events-hero {
-          min-height: 60vh;
+          min-height: 65vh;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -250,9 +273,27 @@ function Events() {
           background: linear-gradient(
             180deg,
             var(--cream) 0%,
+            #FDF5E6 30%,
             var(--cream-dark) 100%
           );
           text-align: center;
+          overflow: hidden;
+        }
+
+        .events-hero::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: radial-gradient(
+            ellipse at center bottom,
+            rgba(255, 140, 0, 0.08) 0%,
+            rgba(255, 215, 0, 0.05) 40%,
+            transparent 70%
+          );
+          pointer-events: none;
         }
 
         .events-hero-3d {
@@ -261,14 +302,22 @@ function Events() {
           left: 0;
           width: 100%;
           height: 100%;
-          opacity: 0.5;
+          opacity: 0.85;
           pointer-events: none;
+          z-index: 1;
         }
 
         .events-hero-content {
           position: relative;
           z-index: 10;
           max-width: 700px;
+          background: rgba(255, 255, 255, 0.85);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          padding: var(--space-xl) var(--space-2xl);
+          border-radius: var(--radius-lg);
+          box-shadow: 0 8px 32px rgba(212, 175, 55, 0.15);
+          border: 1px solid rgba(212, 175, 55, 0.2);
         }
 
         .events-hero-content h1 {
@@ -424,6 +473,24 @@ function Events() {
             var(--cream-dark) 0%,
             var(--gold-light) 100%
           );
+          position: relative;
+          overflow: hidden;
+        }
+
+        .venue-3d-bg {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 0;
+          opacity: 0.5;
+          pointer-events: none;
+        }
+
+        .venue-section .container {
+          position: relative;
+          z-index: 1;
         }
 
         .venue-card {
@@ -462,7 +529,12 @@ function Events() {
           }
 
           .events-hero {
-            min-height: 50vh;
+            min-height: 55vh;
+          }
+
+          .events-hero-content {
+            padding: var(--space-lg) var(--space-md);
+            margin: 0 var(--space-sm);
           }
 
           .event-card {

@@ -1,7 +1,8 @@
 import { useRef, useMemo } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
+import { useFrame } from '@react-three/fiber'
 import { Float, Sparkles } from '@react-three/drei'
 import * as THREE from 'three'
+import Canvas3D from './Canvas3D'
 
 // 3D Marigold Flower
 function Marigold({ position, scale = 1, speed = 1 }) {
@@ -225,14 +226,11 @@ function DecorativeScene({ variant = 'default' }) {
 export default function FloatingElements({ variant = 'default', className = '' }) {
   return (
     <div className={`floating-elements-container ${className}`} style={{ width: '100%', height: '100%' }}>
-      <Canvas
+      <Canvas3D
         camera={{ position: [0, 0, 5], fov: 50 }}
-        dpr={[1, 2]}
-        gl={{ antialias: true, alpha: true }}
-        style={{ background: 'transparent' }}
       >
         <DecorativeScene variant={variant} />
-      </Canvas>
+      </Canvas3D>
     </div>
   )
 }

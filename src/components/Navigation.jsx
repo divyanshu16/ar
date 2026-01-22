@@ -6,8 +6,6 @@ import { coupleData } from '../data/weddingData'
 const navLinks = [
   { path: '/', label: 'Home' },
   { path: '/our-story', label: 'Our Story' },
-  { path: '/events', label: 'Events' },
-  { path: '/gallery', label: 'Gallery' },
   { path: '/quiz', label: 'Quiz' }
 ]
 
