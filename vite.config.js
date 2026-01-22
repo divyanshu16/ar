@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/ar/', // GitHub Pages serves project repos at /repo-name/
+  base: '/', // Custom domain - no subpath needed
   server: {
     host: true,
     port: 5173
