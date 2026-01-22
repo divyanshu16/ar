@@ -1,6 +1,6 @@
-# Akshay & Tripti Wedding Website
+# Abhimanyu & Rupali Wedding Website
 
-A beautiful, immersive 3D wedding website built with React and Three.js for Akshay & Tripti's wedding celebration in Alwar, Rajasthan.
+A beautiful, immersive 3D wedding website built with React and Three.js for Abhimanyu & Rupali's wedding celebration in Alwar, Rajasthan.
 
 ## Features
 
@@ -79,4 +79,4 @@ src/
 
 ## Hashtag
 
-Share your moments: **#AkshayWedsTripti**
+Share your moments: **#AbhimanyuWedsRupali**

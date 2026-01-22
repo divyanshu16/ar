@@ -1,4 +1,4 @@
-// Wedding Data for Akshay & Tripti
+// Wedding Data for Abhimanyu & Rupali
 // February 7-8, 2026 | Alwar, Rajasthan
 
 export const coupleData = {
@@ -123,7 +123,7 @@ export const loveStoryMilestones = [
 export const quizQuestions = [
   {
     id: 1,
-    question: 'Where did Akshay and Tripti first meet?',
+    question: 'Where did Abhimanyu and Rupali first meet?',
     options: ['College', 'Through friends', 'At work', 'Online'],
     correctAnswer: 1 // placeholder - update with real answer
   },
@@ -136,7 +136,7 @@ export const quizQuestions = [
   {
     id: 3,
     question: 'Who said "I love you" first?',
-    options: ['Akshay', 'Tripti', 'Both at the same time', 'Neither admits it!'],
+    options: ['Abhimanyu', 'Rupali', 'Both at the same time', 'Neither admits it!'],
     correctAnswer: 0 // placeholder
   },
   {
@@ -147,7 +147,7 @@ export const quizQuestions = [
   },
   {
     id: 5,
-    question: 'What is Akshay\'s nickname for Tripti?',
+    question: 'What is Abhimanyu\'s nickname for Rupali?',
     options: ['Sweetheart', 'Jaan', 'Cutie', 'It\'s a secret!'],
     correctAnswer: 3 // placeholder
   }
@@ -157,7 +157,7 @@ export const galleryImages = [
   {
     id: 1,
     src: '/images/couple-1.jpg',
-    alt: 'Akshay and Tripti',
+    alt: 'Abhimanyu and Rupali',
     caption: 'Our journey begins'
   },
   {
