@@ -407,6 +407,14 @@ a:hover {
   pointer-events: auto;
 }
 
+/* Ensure all 3D background elements never block clicks */
+[class*="-3d-bg"] *,
+[class*="-3d-bg"] canvas,
+[class*="sacred-fire"] *,
+[class*="sacred-fire"] canvas {
+  pointer-events: none !important;
+}
+
 /* Loading Screen */
 .loading-screen {
   position: fixed;

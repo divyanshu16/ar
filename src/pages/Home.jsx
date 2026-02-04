@@ -1,4 +1,4 @@
-import { useEffect, useState, Suspense, useRef } from 'react'
+import { useEffect, useState, useCallback, Suspense, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useFrame } from '@react-three/fiber'
@@ -8,6 +8,149 @@ import FloatingElements from '../components/3d/FloatingElements'
 import Canvas3D from '../components/3d/Canvas3D'
 import SacredFire from '../components/3d/SacredFire'
 import { DiyaArrangement } from '../components/3d/Diya'
+
+// Weather code to description and icon mapping
+const weatherDescriptions = {
+  0: { text: 'Clear sky', icon: '☀️' },
+  1: { text: 'Mostly clear', icon: '🌤️' },
+  2: { text: 'Partly cloudy', icon: '⛅' },
+  3: { text: 'Overcast', icon: '☁️' },
+  45: { text: 'Foggy', icon: '🌫️' },
+  48: { text: 'Icy fog', icon: '🌫️' },
+  51: { text: 'Light drizzle', icon: '🌦️' },
+  53: { text: 'Drizzle', icon: '🌦️' },
+  55: { text: 'Heavy drizzle', icon: '🌧️' },
+  61: { text: 'Light rain', icon: '🌧️' },
+  63: { text: 'Rain', icon: '🌧️' },
+  65: { text: 'Heavy rain', icon: '🌧️' },
+  80: { text: 'Light showers', icon: '🌦️' },
+  81: { text: 'Showers', icon: '🌧️' },
+  82: { text: 'Heavy showers', icon: '🌧️' },
+  95: { text: 'Thunderstorm', icon: '⛈️' },
+}
+
+function getWeatherInfo(code) {
+  return weatherDescriptions[code] || { text: 'Clear', icon: '☀️' }
+}
+
+// Weather Component - fetches hourly data from Open-Meteo API
+function WeatherSection() {
+  const [weather, setWeather] = useState(null)
+  const [error, setError] = useState(false)
+
+  useEffect(() => {
+    const lat = 27.627449722305748
+    const lon = 76.60525920859347
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,weathercode,precipitation_probability_max,sunrise,sunset&hourly=temperature_2m,weathercode,relativehumidity_2m,windspeed_10m,precipitation_probability&timezone=Asia/Kolkata&start_date=2026-02-07&end_date=2026-02-08`
+
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        if (data.daily && data.hourly) {
+          const days = data.daily.time.map((date, i) => {
+            // Get hourly data for this day (every 3 hours for key times)
+            const dayStart = i * 24
+            const keyHours = [0, 3, 6, 9, 12, 15, 18, 21] // midnight to 9PM
+            const hourlyData = keyHours.map(h => ({
+              hour: h,
+              label: h === 0 ? '12 AM' : h < 12 ? `${h} AM` : h === 12 ? '12 PM' : `${h - 12} PM`,
+              temp: Math.round(data.hourly.temperature_2m[dayStart + h]),
+              weatherCode: data.hourly.weathercode[dayStart + h],
+              humidity: data.hourly.relativehumidity_2m[dayStart + h],
+              windSpeed: Math.round(data.hourly.windspeed_10m[dayStart + h]),
+              precipChance: data.hourly.precipitation_probability[dayStart + h],
+            }))
+
+            return {
+              date,
+              dateLabel: i === 0 ? 'Feb 7 – Day One' : 'Feb 8 – Day Two',
+              maxTemp: Math.round(data.daily.temperature_2m_max[i]),
+              minTemp: Math.round(data.daily.temperature_2m_min[i]),
+              weatherCode: data.daily.weathercode[i],
+              precipChance: data.daily.precipitation_probability_max?.[i] ?? null,
+              sunrise: data.daily.sunrise?.[i]?.split('T')[1] || '',
+              sunset: data.daily.sunset?.[i]?.split('T')[1] || '',
+              hourly: hourlyData,
+            }
+          })
+          setWeather(days)
+        }
+      })
+      .catch(() => setError(true))
+  }, [])
+
+  if (error || !weather) return null
+
+  return (
+    <section id="weather" className="weather-section">
+      <div className="container">
+        <motion.div
+          className="section-header"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          <h2>Weather in Alwar <ShareLink sectionId="weather" /></h2>
+          <div className="ornament" />
+        </motion.div>
+
+        <div className="weather-days">
+          {weather.map((day, i) => {
+            const dayInfo = getWeatherInfo(day.weatherCode)
+            return (
+              <motion.div
+                key={day.date}
+                className="weather-day-card"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.15 }}
+              >
+                {/* Day Summary */}
+                <div className="weather-day-summary">
+                  <span className="weather-day-label">{day.dateLabel}</span>
+                  <div className="weather-summary-row">
+                    <span className="weather-icon-lg">{dayInfo.icon}</span>
+                    <div className="weather-summary-info">
+                      <div className="weather-temps">
+                        <span className="weather-high">{day.maxTemp}°</span>
+                        <span className="weather-sep">/</span>
+                        <span className="weather-low">{day.minTemp}°C</span>
+                      </div>
+                      <span className="weather-desc">{dayInfo.text}</span>
+                    </div>
+                  </div>
+                  <div className="weather-meta">
+                    {day.precipChance !== null && <span>💧 Rain: {day.precipChance}%</span>}
+                    <span>🌅 {day.sunrise}</span>
+                    <span>🌇 {day.sunset}</span>
+                  </div>
+                </div>
+
+                {/* Hourly Breakdown */}
+                <div className="weather-hourly">
+                  {day.hourly.map(h => {
+                    const hInfo = getWeatherInfo(h.weatherCode)
+                    return (
+                      <div key={h.hour} className="weather-hour">
+                        <span className="hour-label">{h.label}</span>
+                        <span className="hour-icon">{hInfo.icon}</span>
+                        <span className="hour-temp">{h.temp}°</span>
+                        <span className="hour-detail">💧{h.precipChance}%</span>
+                        <span className="hour-detail">💨{h.windSpeed}</span>
+                      </div>
+                    )
+                  })}
+                </div>
+              </motion.div>
+            )
+          })}
+        </div>
+      </div>
+    </section>
+  )
+}
 
 // Smooth scroll function for anchor navigation
 const scrollToSection = (e, sectionId) => {
@@ -422,7 +565,41 @@ function getEventPattern(eventId) {
   }
 }
 
+function ShareLink({ sectionId }) {
+  const [copied, setCopied] = useState(false)
+  const handleCopy = useCallback(() => {
+    const url = `${window.location.origin}/#${sectionId}`
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }, [sectionId])
+
+  return (
+    <button
+      className="share-link-btn"
+      onClick={handleCopy}
+      title={`Copy link to ${sectionId}`}
+      aria-label={`Copy shareable link for ${sectionId} section`}
+    >
+      {copied ? '✓' : '🔗'}
+      {copied && <span className="share-tooltip">Copied!</span>}
+    </button>
+  )
+}
+
 function Home() {
+  // Scroll to hash section on load (for shareable links like /#venue)
+  useEffect(() => {
+    const hash = window.location.hash.replace('#', '')
+    if (hash) {
+      setTimeout(() => {
+        const el = document.getElementById(hash)
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 500)
+    }
+  }, [])
+
   return (
     <motion.div
       className="home-page"
@@ -513,7 +690,7 @@ function Home() {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <h2>Functions & Ceremonies</h2>
+            <h2>Functions & Ceremonies <ShareLink sectionId="events" /></h2>
             <div className="ornament ornament-lg" />
             <p className="events-intro">
               Two days of celebration, traditions, and joy as we begin our forever together.
@@ -560,14 +737,8 @@ function Home() {
         </div>
       </section>
 
-      {/* Venue Section */}
+      {/* Venue & How to Reach Section */}
       <section id="venue" className="venue-section">
-        {/* 3D Hearts Background */}
-        <div className="venue-3d-bg">
-          <Suspense fallback={null}>
-            <FloatingElements variant="hearts" />
-          </Suspense>
-        </div>
         <div className="container">
           <motion.div
             className="section-header"
@@ -575,35 +746,109 @@ function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <p className="section-subtitle">The Venue</p>
-            <h2>{coupleData.venue.name}</h2>
+            <h2>Venue & How to Reach <ShareLink sectionId="venue" /></h2>
             <div className="ornament" />
           </motion.div>
 
+          {/* Venue Card with Map */}
           <motion.div
             className="venue-card"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.15 }}
           >
             <div className="venue-info">
-              <p className="venue-address">
-                <span className="venue-icon">📍</span>
-                {coupleData.venue.name}<br />
-                {coupleData.venue.city}, {coupleData.venue.state}
+              <p className="venue-name-text">{coupleData.venue.name}</p>
+              <p className="venue-full-address">
+                8km Stone, Narnaul-Behror-Alwar Rd,<br />
+                Opp. National Academy School, Alwar, Rajasthan 301001
               </p>
-              <p className="venue-note">
-                All ceremonies will be held at this beautiful venue.
-                Please check individual event details for specific locations within the resort.
-              </p>
+              <a
+                href="https://www.google.com/maps/dir/?api=1&destination=27.627449722305748,76.60525920859347"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary directions-btn"
+              >
+                📍 Get Directions
+              </a>
+            </div>
+            <div className="venue-map">
+              <iframe
+                src="https://maps.google.com/maps?q=27.627449722305748,76.60525920859347&z=15&output=embed"
+                width="100%"
+                height="250"
+                style={{ border: 0, borderRadius: 'var(--radius-md)' }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Venue Map"
+              />
             </div>
           </motion.div>
+
+          {/* Travel Routes */}
+          <div className="travel-routes">
+            <motion.div
+              className="travel-card"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+            >
+              <span className="travel-icon">✈️</span>
+              <h4>From Delhi Airport (IGI)</h4>
+              <p className="travel-distance">~160 km · 3 – 3.5 hrs by car</p>
+              <p className="travel-tip">Pre-book a cab via MakeMyTrip or CabBazar. Ola/Uber available for pickup.</p>
+            </motion.div>
+
+            <motion.div
+              className="travel-card"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+            >
+              <span className="travel-icon">✈️</span>
+              <h4>From Jaipur Airport</h4>
+              <p className="travel-distance">~150 km · 3 hrs by car</p>
+              <p className="travel-tip">Hire a taxi from the airport or take an RSRTC bus to Alwar.</p>
+            </motion.div>
+
+            <motion.div
+              className="travel-card"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+            >
+              <span className="travel-icon">🚂</span>
+              <h4>By Train to Alwar Junction</h4>
+              <p className="travel-distance">~10 km from station · 20 min by auto</p>
+              <p className="travel-tip">Frequent trains from Delhi (~2.5 hrs). Shatabdi, Kota Janshatabdi, Double Decker available.</p>
+            </motion.div>
+
+            <motion.div
+              className="travel-card"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4 }}
+            >
+              <span className="travel-icon">🚗</span>
+              <h4>By Road / Self Drive</h4>
+              <p className="travel-distance">NH 48 via Gurgaon → Bhiwadi → Alwar</p>
+              <p className="travel-tip">Ola/Uber have limited availability in Alwar. Pre-book cabs or arrange through the resort.</p>
+            </motion.div>
+          </div>
         </div>
       </section>
 
+      {/* Weather Section */}
+      <WeatherSection />
+
       {/* Hashtag Section */}
-      <section className="hashtag-section">
+      <section id="hashtag" className="hashtag-section">
         {/* 3D Floating Hearts Background */}
         <div className="section-3d-bg hashtag-3d">
           <Suspense fallback={null}>
@@ -618,13 +863,51 @@ function Home() {
           transition={{ duration: 0.8 }}
         >
           <p className="hashtag-label">Share your moments with us</p>
-          <h2 className="hashtag gradient-text">{coupleData.hashtag}</h2>
+          <h2 className="hashtag gradient-text">{coupleData.hashtag} <ShareLink sectionId="hashtag" /></h2>
         </motion.div>
       </section>
 
       <style>{`
         .home-page {
           overflow-x: hidden;
+        }
+
+        /* Share Link Button */
+        .share-link-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          background: none;
+          border: none;
+          cursor: pointer;
+          font-size: 0.45em;
+          opacity: 0.4;
+          transition: opacity 0.2s ease;
+          vertical-align: middle;
+          position: relative;
+          padding: 4px;
+        }
+        .share-link-btn:hover {
+          opacity: 0.8;
+        }
+        .share-tooltip {
+          position: absolute;
+          top: -28px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: var(--gold-dark);
+          color: var(--cream);
+          font-family: var(--font-body);
+          font-size: 11px;
+          padding: 3px 10px;
+          border-radius: var(--radius-sm);
+          white-space: nowrap;
+          pointer-events: none;
+          animation: tooltipFade 0.3s ease;
+        }
+        @keyframes tooltipFade {
+          from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+          to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
 
         /* Hero Section */
@@ -658,6 +941,11 @@ function Home() {
           filter: blur(1px);
         }
 
+        .hero-sacred-fire *,
+        .hero-sacred-fire canvas {
+          pointer-events: none !important;
+        }
+
         .section-3d-bg {
           position: absolute;
           top: 0;
@@ -667,6 +955,11 @@ function Home() {
           z-index: 0;
           opacity: 0.4;
           pointer-events: none;
+        }
+
+        .section-3d-bg *,
+        .section-3d-bg canvas {
+          pointer-events: none !important;
         }
 
         .hashtag-3d {
@@ -1018,25 +1311,14 @@ function Home() {
           overflow: hidden;
         }
 
-        .venue-3d-bg {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          z-index: 0;
-          opacity: 0.5;
-          pointer-events: none;
-        }
-
         .venue-section .container {
           position: relative;
           z-index: 1;
         }
 
         .venue-card {
-          max-width: 600px;
-          margin: 0 auto;
+          max-width: 700px;
+          margin: 0 auto var(--space-xl);
           background: var(--ivory);
           border-radius: var(--radius-lg);
           padding: var(--space-xl);
@@ -1044,24 +1326,224 @@ function Home() {
           text-align: center;
         }
 
-        .venue-address {
+        .venue-name-text {
           font-family: var(--font-display);
-          font-size: 1.25rem;
+          font-size: 1.5rem;
           color: var(--dark-brown);
-          margin: 0 0 var(--space-md);
-          line-height: 1.6;
+          margin: 0 0 var(--space-sm);
         }
 
-        .venue-icon {
-          display: block;
+        .venue-full-address {
+          color: var(--warm-gray);
+          font-size: 0.9375rem;
+          line-height: 1.6;
+          margin: 0 0 var(--space-md);
+        }
+
+        .venue-info {
+          position: relative;
+          z-index: 2;
+        }
+
+        .directions-btn {
+          margin-bottom: var(--space-lg);
+          display: inline-block;
+          position: relative;
+          z-index: 2;
+        }
+
+        .venue-map {
+          position: relative;
+          z-index: 1;
+          border-radius: var(--radius-md);
+          overflow: hidden;
+        }
+
+        /* Travel Routes */
+        .travel-routes {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: var(--space-lg);
+          max-width: 900px;
+          margin: 0 auto;
+        }
+
+        .travel-card {
+          background: var(--ivory);
+          border-radius: var(--radius-lg);
+          padding: var(--space-lg);
+          box-shadow: var(--shadow-soft);
+          border: 1px solid rgba(212, 175, 55, 0.1);
+          text-align: center;
+        }
+
+        .travel-icon {
           font-size: 2rem;
+          display: block;
           margin-bottom: var(--space-sm);
         }
 
-        .venue-note {
+        .travel-card h4 {
+          font-family: var(--font-display);
+          font-size: 1.125rem;
+          color: var(--dark-brown);
+          margin: 0 0 var(--space-sm);
+        }
+
+        .travel-distance {
+          font-weight: 500;
+          color: var(--gold-dark);
+          font-size: 0.9375rem;
+          margin: 0 0 var(--space-sm);
+        }
+
+        .travel-tip {
+          color: var(--warm-gray);
+          font-size: 0.8125rem;
+          margin: 0;
+          line-height: 1.5;
+        }
+
+        /* Weather Section */
+        .weather-section {
+          padding: var(--space-2xl) 0;
+          background: var(--cream);
+        }
+
+        .weather-days {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+          gap: var(--space-xl);
+          max-width: 900px;
+          margin: 0 auto;
+        }
+
+        .weather-day-card {
+          background: var(--ivory);
+          border-radius: var(--radius-lg);
+          overflow: hidden;
+          box-shadow: var(--shadow-soft);
+          border: 1px solid rgba(212, 175, 55, 0.1);
+        }
+
+        .weather-day-summary {
+          padding: var(--space-lg);
+          text-align: center;
+        }
+
+        .weather-day-label {
+          font-family: var(--font-display);
+          font-size: 1.25rem;
+          color: var(--dark-brown);
+          font-weight: 500;
+          display: block;
+          margin-bottom: var(--space-md);
+        }
+
+        .weather-summary-row {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: var(--space-md);
+          margin-bottom: var(--space-md);
+        }
+
+        .weather-icon-lg {
+          font-size: 3rem;
+          line-height: 1;
+        }
+
+        .weather-summary-info {
+          text-align: left;
+        }
+
+        .weather-temps {
+          display: flex;
+          align-items: baseline;
+          gap: var(--space-xs);
+        }
+
+        .weather-high {
+          font-family: var(--font-display);
+          font-size: 2rem;
+          color: var(--dark-brown);
+          font-weight: 500;
+        }
+
+        .weather-sep {
+          color: var(--warm-gray);
+          font-size: 1.25rem;
+        }
+
+        .weather-low {
+          font-family: var(--font-display);
+          font-size: 1.25rem;
+          color: var(--warm-gray);
+        }
+
+        .weather-desc {
+          font-family: var(--font-body);
           color: var(--warm-gray);
           font-size: 0.9375rem;
-          margin: 0;
+        }
+
+        .weather-meta {
+          display: flex;
+          justify-content: center;
+          gap: var(--space-md);
+          font-size: 0.8125rem;
+          color: var(--warm-gray);
+          flex-wrap: wrap;
+        }
+
+        /* Hourly Breakdown */
+        .weather-hourly {
+          display: flex;
+          overflow-x: auto;
+          border-top: 1px solid var(--light-gray);
+          background: rgba(212, 175, 55, 0.03);
+        }
+
+        .weather-hour {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 4px;
+          padding: var(--space-md) var(--space-sm);
+          min-width: 65px;
+          flex-shrink: 0;
+        }
+
+        .hour-label {
+          font-size: 0.6875rem;
+          text-transform: uppercase;
+          color: var(--warm-gray);
+          letter-spacing: 0.05em;
+          white-space: nowrap;
+        }
+
+        .hour-icon {
+          font-size: 1.25rem;
+        }
+
+        .hour-temp {
+          font-family: var(--font-display);
+          font-size: 1rem;
+          font-weight: 500;
+          color: var(--dark-brown);
+        }
+
+        .hour-detail {
+          font-size: 0.625rem;
+          color: var(--warm-gray);
+        }
+
+        .weather-note {
+          text-align: center;
+          font-size: 0.75rem;
+          color: var(--warm-gray);
+          margin-top: var(--space-lg);
+          opacity: 0.7;
         }
 
         /* Hashtag Section */

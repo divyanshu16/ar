@@ -88,6 +88,11 @@ function PersistentCornerDecor() {
           z-index: 5;
           opacity: 0.4;
         }
+
+        .persistent-3d-corners *,
+        .persistent-3d-corners canvas {
+          pointer-events: none !important;
+        }
       `}</style>
     </div>
   )
