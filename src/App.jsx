@@ -12,6 +12,7 @@ import Canvas3D from './components/3d/Canvas3D'
 const Home = lazy(() => import('./pages/Home'))
 const OurStory = lazy(() => import('./pages/OurStory'))
 const Quiz = lazy(() => import('./pages/Quiz'))
+const Gallery = lazy(() => import('./pages/Gallery'))
 
 // Persistent 3D Corner Decorations
 function CornerPaisley({ position, rotation, scale = 1 }) {
@@ -113,6 +114,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/our-story" element={<OurStory />} />
             <Route path="/quiz" element={<Quiz />} />
+            <Route path="/gallery" element={<Gallery />} />
           </Routes>
         </AnimatePresence>
       </Suspense>
