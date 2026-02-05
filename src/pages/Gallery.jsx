@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion'
 import { Float } from '@react-three/drei'
-import { coupleData } from '../data/weddingData'
 import { Diya } from '../components/3d/Diya'
 import Canvas3D from '../components/3d/Canvas3D'
 
@@ -68,7 +67,7 @@ function Gallery() {
           </motion.a>
 
           <p className="upload-signin-hint">
-            For best experience, sign in with Google if prompted.
+            For best experience, sign in with Google if prompted or simply use the Google Drive app :)
           </p>
         </motion.div>
       </section>
@@ -84,7 +83,7 @@ function Gallery() {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <p className="hashtag-label">Don't forget to tag your posts</p>
-            <h3 className="hashtag gradient-text">{coupleData.hashtag}</h3>
+            <h3 className="hashtag gradient-text">#CodemeetsClause</h3>
           </motion.div>
         </div>
       </section>
