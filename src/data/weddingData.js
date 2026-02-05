@@ -100,7 +100,7 @@ export const loveStoryMilestones = [
   {
     id: 4,
     title: 'Meeting the Families',
-    year: '2022',
+    year: '2023',
     description: 'Two families united in joy, blessing this beautiful bond.',
     icon: '👨‍👩‍👧‍👦'
   },
