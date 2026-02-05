@@ -1359,10 +1359,10 @@ function Home() {
           overflow: hidden;
         }
 
-        /* Travel Routes */
+        /* Travel Routes - 2x2 Grid */
         .travel-routes {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          grid-template-columns: repeat(2, 1fr);
           gap: var(--space-lg);
           max-width: 900px;
           margin: 0 auto;
@@ -1624,6 +1624,17 @@ function Home() {
 
           .event-card {
             padding: var(--space-lg);
+          }
+
+          .travel-routes {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        /* Tablet - keep 2x2 grid */
+        @media (min-width: 481px) and (max-width: 768px) {
+          .travel-routes {
+            grid-template-columns: repeat(2, 1fr);
           }
         }
       `}</style>
