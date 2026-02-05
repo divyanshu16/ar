@@ -67,7 +67,7 @@ function Gallery() {
           </motion.a>
 
           <p className="upload-signin-hint">
-            For best experience, sign in with Google if prompted or simply use the Google Drive app :)
+            For best experience, sign in with Google if prompted or simply use the Google Drive app 😊
           </p>
         </motion.div>
       </section>
