@@ -5,7 +5,7 @@ export const coupleData = {
   groomName: 'Abhimanyu',
   brideName: 'Rupali',
   weddingDate: new Date('2026-02-08T19:00:00'),
-  hashtag: '#AbhimanyuWedsRupali',
+  hashtag: '#CodemeetsClause',
   tagline: 'Two souls, one journey',
   venue: {
     name: 'Alwar Motel and Resorts',
