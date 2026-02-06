@@ -72,29 +72,20 @@ function Gallery() {
         </motion.div>
       </section>
 
-      {/* Hashtag Section */}
-      <section className="hashtag-section-wrapper">
-        <div className="container text-center">
-          <motion.div
-            className="hashtag-section"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <p className="hashtag-label">Don't forget to tag your posts</p>
-            <h3 className="hashtag gradient-text">#CodemeetsClause</h3>
-          </motion.div>
-        </div>
-      </section>
-
       <style>{`
         .gallery-page {
           overflow-x: hidden;
+          min-height: calc(100vh - 120px);
+          display: flex;
+          flex-direction: column;
+        }
+
+        .gallery-hero {
+          flex: 1;
         }
 
         /* Gallery Hero - Compact layout with CTA above the fold */
-        .gallery-hero {
+        .gallery-hero.gallery-hero {
           min-height: auto;
           display: flex;
           align-items: center;
@@ -185,30 +176,6 @@ function Gallery() {
           max-width: 400px;
           margin-left: auto;
           margin-right: auto;
-        }
-
-        /* Hashtag Section */
-        .hashtag-section-wrapper {
-          padding: var(--space-xl) 0;
-          background: var(--cream);
-        }
-
-        .hashtag-section {
-          max-width: 600px;
-          margin: 0 auto;
-          padding-top: var(--space-lg);
-          border-top: 1px solid var(--gold-light);
-        }
-
-        .hashtag-label {
-          color: var(--warm-gray);
-          margin-bottom: var(--space-sm);
-          font-size: 0.95rem;
-        }
-
-        .hashtag-section .hashtag {
-          font-family: var(--font-display);
-          font-size: 2rem;
         }
 
         @media (max-width: 768px) {

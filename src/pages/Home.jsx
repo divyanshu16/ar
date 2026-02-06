@@ -847,26 +847,6 @@ function Home() {
       {/* Weather Section */}
       <WeatherSection />
 
-      {/* Hashtag Section */}
-      <section id="hashtag" className="hashtag-section">
-        {/* 3D Floating Hearts Background */}
-        <div className="section-3d-bg hashtag-3d">
-          <Suspense fallback={null}>
-            <FloatingElements variant="hearts" />
-          </Suspense>
-        </div>
-        <motion.div
-          className="container text-center"
-          initial={{ opacity: 0, scale: 0.9 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-        >
-          <p className="hashtag-label">Share your moments with us</p>
-          <h2 className="hashtag gradient-text">{coupleData.hashtag} <ShareLink sectionId="hashtag" /></h2>
-        </motion.div>
-      </section>
-
       <style>{`
         .home-page {
           overflow-x: hidden;
@@ -1544,38 +1524,6 @@ function Home() {
           color: var(--warm-gray);
           margin-top: var(--space-lg);
           opacity: 0.7;
-        }
-
-        /* Hashtag Section */
-        .hashtag-section {
-          padding: var(--space-2xl) 0;
-          background: linear-gradient(
-            135deg,
-            var(--cream-dark) 0%,
-            var(--gold-light) 100%
-          );
-          position: relative;
-          overflow: hidden;
-        }
-
-        .hashtag-section .container {
-          position: relative;
-          z-index: 1;
-        }
-
-        .hashtag-label {
-          font-family: var(--font-body);
-          text-transform: uppercase;
-          letter-spacing: 0.2em;
-          font-size: 0.875rem;
-          color: var(--warm-gray);
-          margin-bottom: var(--space-md);
-        }
-
-        .hashtag {
-          font-family: var(--font-display);
-          font-size: clamp(2rem, 5vw, 3.5rem);
-          font-weight: 500;
         }
 
         @media (max-width: 768px) {

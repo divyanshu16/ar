@@ -5,6 +5,7 @@ import { useFrame } from '@react-three/fiber'
 import { Float, Sparkles } from '@react-three/drei'
 import * as THREE from 'three'
 import Navigation from './components/Navigation'
+import Footer from './components/Footer'
 import LoadingScreen from './components/LoadingScreen'
 import Canvas3D from './components/3d/Canvas3D'
 
@@ -118,6 +119,7 @@ function App() {
           </Routes>
         </AnimatePresence>
       </Suspense>
+      <Footer />
     </div>
   )
 }
